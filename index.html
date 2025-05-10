@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Twitter Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .filter-blue {
+        filter: invert(33%) sepia(97%) saturate(749%) hue-rotate(185deg) brightness(92%) contrast(101%);
+        transition: 0.3s;
+      }
+      .filter-blue:hover {
+        filter: invert(34%) sepia(83%) saturate(1325%) hue-rotate(180deg) brightness(90%) contrast(102%);
+      }
+      /* Add scroll lock for body when sidebar is open on mobile */
+      .no-scroll {
+        overflow: hidden;
+      }
+      /* Hide scrollbar but allow scrolling */
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      /* Add responsive sidebar styles */
+      @media (max-width: 768px) {
+        .mobile-sidebar {
+          width: 100%;
+          height: 100vh;
+          position: fixed;
+          top: 0;
+          left: -100%;
+          transition: 0.3s;
+          z-index: 50;
+        }
+        
+        .mobile-sidebar.active {
+          left: 0;
+        }
+      }
+      
+      /* Add sticky header for mobile */
+      .sticky-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+      }
+
+      /* Improve tweet layout on small screens */
+      @media (max-width: 640px) {
+        .tweet-actions {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+        
+        .tweet-media {
+          margin: 0 -1rem;
+          width: calc(100% + 2rem);
+        }
+      }
+    </style>
+  </head>
+  <body class="flex justify-center bg-white min-h-screen overflow-x-hidden ">
+    <div class="flex w-full max-w-[1300px] relative">
+      <!-- Left Sidebar -->
+      <div class="flex flex-col border-r border-gray-300 w-[70px] md:w-[88px] lg:w-[275px] p-2 lg:p-4 
+           items-center lg:items-start fixed top-0 bottom-0 left- bg-white z-20 
+           transform transition-transform duration-300 ease-in-out
+           md:translate-x-0 mobile-sidebar ">
+        <div class="logo-cover h-[5rem] flex items-center">
+          <div class="logo h-12 w-12 rounded-full hover:bg-gray-200 cursor-pointer p-2">
+            <img src="icons/logo.svg" alt="X Logo" class="w-full h-full" />
+          </div>
+        </div>
+        <div class="space-y-1 mt-2 w-full">
+          <!-- Menu items with proper mobile layout -->
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/home.svg" alt="Home" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Home</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/search.svg" alt="Search" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Explore</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/notification.svg" alt="Notifications" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Notifications</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/message.svg" alt="Messages" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Messages</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/grok.svg" alt="Grok" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Grok</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/bookmark.svg" alt="Bookmarks" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Bookmarks</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/community.svg" alt="Communities" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Communities</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/premium.svg" alt="Premium" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Premium</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/verified.svg" alt="Verified" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Verified</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/profile.svg" alt="Profile" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">Profile</span>
+          </div>
+          <div class="flex items-center gap-4 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="icons/more.svg" alt="More" class="w-6 h-6" />
+            <span class="hidden lg:block text-xl">More</span>
+          </div>
+        </div>
+        <button class="bg-blue-500 text-white rounded-full h-12 w-12 lg:w-56 mt-6 
+             hover:bg-blue-600 flex items-center justify-center transition-colors duration-200">
+          <span class="hidden lg:block text-lg font-bold">Post</span>
+          <img src="icons/post.svg" alt="Post" class="w-6 h-6 lg:hidden" />
+        </button>
+
+        <!-- User Profile Section -->
+        <div class="mt-auto mb-4 w-full">
+          <div class="flex items-center gap-3 p-3 rounded-full cursor-pointer hover:bg-gray-200 
+                transition-colors duration-200">
+            <img src="profile/memo.jpg" alt="User Profile" class="w-10 h-10 rounded-full" />
+            <div class="hidden lg:block">
+              <div class="font-bold text-sm">Memo</div>
+              <div class="text-gray-500 text-sm">@Memo-ai</div>
+            </div>
+            <img src="icons/more.svg" alt="More" class="hidden lg:block w-5 h-5 ml-auto" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle Section -->
+      <main class="flex-1 min-h-screen border-x border-gray-300 ml-[70px] md:ml-[88px] lg:ml-[275px] 
+            max-w-[600px] w-full">
+        <!-- Tabs -->
+        <div class="sticky-header border-b border-gray-200">
+          <div class="flex justify-evenly items-center h-[4rem] border-b border-gray-300 w-full">
+            <div class="w-full h-full flex justify-center items-center">
+              <button class="font-semibold w-full h-full border-b-4 border-transparent hover:border-blue-500 hover:bg-gray-100 transition-all duration-200">For you</button>
+            </div>
+            <div class="w-full h-full flex justify-center items-center">
+              <button class="font-semibold w-full h-full border-b-4 border-transparent hover:border-blue-500 hover:bg-gray-100 transition-all duration-200">Following</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post Box -->
+        <div class="flex items-start gap-3 p-4 border-b border-gray-300">
+          <img src="profile/memo.jpg" class="h-[50px] w-[50px] rounded-full" alt="Profile Image" />
+          <input 
+            type="text" 
+            placeholder="What's happening?" 
+            class="w-full h-12 px-3 border-none focus:outline-none text-lg bg-transparent" 
+          />
+        </div>
+
+        <!-- Post Options -->
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-300">
+          <div class="flex items-center ml-7 gap-2">
+            <div class="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+              <img src="icons/media.svg" alt="Media" class="h-6 w-6 filter-blue" />
+            </div>
+            <div class="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+              <img src="icons/gif.svg" alt="GIF" class="h-6 w-6 filter-blue" />
+            </div>
+            <div class="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+              <img src="icons/poll.svg" alt="Poll" class="h-6 w-6 filter-blue" />
+            </div>
+            <div class="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+              <img src="icons/emoji.svg" alt="Emoji" class="h-6 w-6 filter-blue" />
+            </div>
+            <div class="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+              <img src="icons/scheduled.svg" alt="Schedule" class="h-6 w-6 filter-blue" />
+            </div>
+            <div class="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+              <img src="icons/location.svg" alt="Location" class="h-6 w-6 filter-blue" />
+            </div>
+          </div>
+          <div class="flex items-center text-white font-bold justify-center gap-4 mr-7 bg-gray-400 w-20 h-9 rounded-3xl hover:bg-gray-500 transition-all duration-200 cursor-pointer">
+            <button>Post</button>
+          </div>
+        </div>
+
+        <!-- Show Posts -->
+        <div class="h-10 w-full mt-2 mb-4 flex items-center justify-center gap-2 text-blue-500">
+          <button>Show all posts</button>
+        </div>
+
+        <!-- Tweets Section with improved spacing -->
+        <div class="space-y-4 pb-16">
+          <div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-4 mt-6">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/Elon.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">Elon Musk</span>
+                  <span class="text-sm text-gray-500">@elonmusk · 6h</span>
+                </div>
+                <p class="mt-1 text-gray-700">
+                  From <span class="text-blue-500 font-semibold">DogeDesigner</span>
+                </p>
+                <div class="tweet-media mt-2">
+                  <video class="w-full rounded-lg" controls>
+                    <source src="posts/elon-musk.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>3.6K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>17K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>62K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>1.2M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-4 mt-6">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/DelhiPolice.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">Delhi Police</span>
+                  <span class="text-sm text-gray-500">@DelhiPolice · 3h</span>
+                </div>
+                <p class="mt-1 text-gray-700">Your safety is our top priority. Report any suspicious activity immediately. Dial 112 🚨</p>
+                <div class="tweet-media mt-2">
+                  <img src="posts/delhipolice.jpg" alt="Alert" class="w-full rounded-lg" />
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>830</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>3.2K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>9.5K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>200K</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-4 mt-6">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/aadi.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">Thakur Aaditya singh</span>
+                  <span class="text-sm text-gray-500">@thakuraadi</span>
+                </div>
+                <p class="mt-1 text-gray-700">Merging the wonders of biotechnology with the power or AI</p>
+                <div class="tweet-media mt-2">
+                  <video class="w-full rounded-lg" controls>
+                    <source src="posts/aadi-video.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>3.6K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>17K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>62K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>1.2M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-4 mt-6">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/Modi.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">Narendra Modi</span>
+                  <span class="text-sm text-gray-500">@narendramodi · 1h</span>
+                </div>
+                <p class="mt-1 text-gray-700">India stands united for development and progress. Together, we will build a stronger nation. 🇮🇳</p>
+                <div class="tweet-media mt-2">
+                  <video class="w-full rounded-lg" controls>
+                    <source src="posts/modi.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>9.6K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>45K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>102K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>5.1M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Tweets -->
+          <div class="max-w-xl mx-auto border-b border-gray-100 p-4">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/techcrunch.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">TechCrunch</span>
+                  <img src="icons/verified.svg" class="h-5 w-5" />
+                  <span class="text-sm text-gray-500">@TechCrunch · 2h</span>
+                </div>
+                <p class="mt-1 text-gray-700">OpenAI announces GPT-5 with breakthrough capabilities in multimodal understanding</p>
+                <div class="tweet-media mt-2">
+                  <img src="posts/techcrunch.jpeg" alt="AI News" class="w-full rounded-xl" />
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>2.4K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>15.2K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>45.8K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>1.2M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional tweet examples -->
+          <div class="max-w-xl mx-auto border-b border-gray-100 p-4">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/spacex.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">SpaceX</span>
+                  <img src="icons/verified.svg" class="h-5 w-5" />
+                  <span class="text-sm text-gray-500">@SpaceX · 4h</span>
+                </div>
+                <p class="mt-1 text-gray-700">Starship launch preparations underway at Starbase 🚀</p>
+                <div class="tweet-media mt-2">
+                  <img src="posts/starship.jpg" alt="Starship" class="w-full rounded-xl" />
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>5.2K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>25.1K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>142.8K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>2.8M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-w-xl mx-auto border-b border-gray-100 p-4">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/microsoft.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">Microsoft</span>
+                  <img src="icons/verified.svg" class="h-5 w-5" />
+                  <span class="text-sm text-gray-500">@Microsoft · 5h</span>
+                </div>
+                <p class="mt-1 text-gray-700">Introducing the next generation of Windows AI features. Experience the future of computing today.</p>
+                <div class="tweet-media mt-2">
+                  <video class="w-full rounded-lg" controls>
+                    <source src="posts/microsoft.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>3.1K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>12.4K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>35.2K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>892K</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-w-xl mx-auto border-b border-gray-100 p-4">
+            <div class="flex items-start space-x-4">
+              <div>
+                <img src="profile/netflix.jpg" alt="Profile" class="w-10 h-10 rounded-full" />
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-800">Netflix</span>
+                  <img src="icons/verified.svg" class="h-5 w-5" />
+                  <span class="text-sm text-gray-500">@netflix · 8h</span>
+                </div>
+                <p class="mt-1 text-gray-700">Your weekend binge-watch is here! The new season of Stranger Things drops NOW! 🎬</p>
+                <div class="tweet-media mt-2">
+                  <video class="w-full rounded-lg" controls>
+                    <source src="posts/netflix.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="tweet-actions flex justify-between items-center mt-3">
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/comment.svg" class="h-5 w-5" />
+                    <span>15.3K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/repost.svg" class="h-5 w-5" />
+                    <span>45.6K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/like.svg" class="h-5 w-5" />
+                    <span>221.5K</span>
+                  </div>
+                  <div class="flex items-center gap-1 text-gray-500">
+                    <img src="icons/views.svg" class="h-5 w-5" />
+                    <span>4.2M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- Right Sidebar -->
+      <div class="hidden lg:flex flex-col w-[350px] p-4 ml-4">
+        <div class="sticky top-0 space-y-4">
+          <div class="w-full bg-gray-100 rounded-full px-4 py-2 flex items-center gap-2 mb-4">
+            <img src="icons/search.svg" alt="Search" class="h-5 w-5 opacity-50" />
+            <input 
+              type="text" 
+              placeholder="Search Twitter" 
+              class="bg-transparent focus:outline-none w-full text-sm" 
+            />
+          </div>
+          <div class="bg-gray-100 p-4 rounded-xl">
+            <h3 class="font-bold text-lg mb-2">Trends for you</h3>
+            <div class="text-sm text-gray-700 space-y-2">
+              <p>#ChatGPT - 50.6K Tweets</p>
+              <p>#Cricket - 120K Tweets</p>
+              <p>#AI - 89.3K Tweets</p>
+              <p>#ISRO - 25.1K Tweets</p>
+              <p>#Blockchain - 45.2K Tweets</p>
+              <p>#SpaceX - 78.9K Tweets</p>
+              <p>#Technology - 92.4K Tweets</p>
+              <p>#Gaming - 67.8K Tweets</p>
+              <a href="#" class="text-blue-500 hover:underline">Show more</a>
+            </div>
+          </div>
+
+          <!-- Who to follow section -->
+          <div class="bg-gray-100 p-4 rounded-xl mt-4">
+            <h3 class="font-bold text-lg mb-4">Who to follow</h3>
+            
+            <div class="space-y-4">
+              <!-- Suggestion 1 -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <img src="profile/techcrunch.jpg" alt="TechCrunch" class="w-10 h-10 rounded-full"/>
+                  <div>
+                    <div class="flex items-center gap-1">
+                      <span class="font-bold text-sm">TechCrunch</span>
+                      <img src="icons/verified.svg" class="h-4 w-4"/>
+                    </div>
+                    <span class="text-gray-500 text-sm">@techcrunch</span>
+                  </div>
+                </div>
+                <button class="bg-black text-white rounded-full px-4 py-1.5 text-sm font-bold hover:bg-gray-800">
+                  Follow
+                </button>
+              </div>
+
+              <!-- Suggestion 2 -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <img src="profile/nasa.jpg" alt="NASA" class="w-10 h-10 rounded-full"/>
+                  <div>
+                    <div class="flex items-center gap-1">
+                      <span class="font-bold text-sm">NASA</span>
+                      <img src="icons/verified.svg" class="h-4 w-4"/>
+                    </div>
+                    <span class="text-gray-500 text-sm">@NASA</span>
+                  </div>
+                </div>
+                <button class="bg-black text-white rounded-full px-4 py-1.5 text-sm font-bold hover:bg-gray-800">
+                  Follow
+                </button>
+              </div>
+
+              <!-- Suggestion 3 -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <img src="profile/google.jpg" alt="Google" class="w-10 h-10 rounded-full"/>
+                  <div>
+                    <div class="flex items-center gap-1">
+                      <span class="font-bold text-sm">Google</span>
+                      <img src="icons/verified.svg" class="h-4 w-4"/>
+                    </div>
+                    <span class="text-gray-500 text-sm">@Google</span>
+                  </div>
+                </div>
+                <button class="bg-black text-white rounded-full px-4 py-1.5 text-sm font-bold hover:bg-gray-800">
+                  Follow
+                </button>
+              </div>
+
+              <a href="#" class="text-blue-500 hover:underline text-sm">Show more</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add mobile menu toggle button -->
+    <button class="fixed bottom-4 right-4 md:hidden bg-blue-500 text-white p-3 rounded-full shadow-lg z-30">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+
+    <!-- Add simple JavaScript for mobile menu -->
+    <script>
+      const menuButton = document.querySelector('button');
+      const sidebar = document.querySelector('.mobile-sidebar');
+      const body = document.querySelector('body');
+
+      menuButton?.addEventListener('click', () => {
+        sidebar?.classList.toggle('active');
+        body?.classList.toggle('no-scroll');
+      });
+    </script>
+  </body>
+</html>

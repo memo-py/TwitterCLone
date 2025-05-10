@@ -1,0 +1,136 @@
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Post Input Animation */
+input[type="text"] {
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Post Buttons */
+button {
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* Post Card Animation */
+.max-w-xl {
+    transition: all 0.3s ease;
+}
+
+.max-w-xl:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Like, Retweet, Reply Buttons */
+.hover\:text-blue-500:hover,
+.hover\:text-green-500:hover {
+    transform: scale(1.1);
+}
+
+/* Profile Images */
+.rounded-full {
+    transition: all 0.3s ease;
+}
+
+.rounded-full:hover {
+    transform: scale(1.1);
+}
+
+/* Sidebar Items */
+.hover\:bg-gray-200 {
+    transition: all 0.2s ease;
+}
+
+/* Search Bar */
+.bg-gray-100 {
+    transition: all 0.3s ease;
+}
+
+.bg-gray-100:focus-within {
+    background-color: #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .w-full {
+        padding: 0.5rem;
+    }
+    
+    .max-w-xl {
+        margin: 0.5rem;
+    }
+}
+
+/* Loading Animation */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    .bg-white {
+        background-color: #2d2d2d;
+    }
+    
+    .text-gray-800 {
+        color: #e5e7eb;
+    }
+    
+    .text-gray-700 {
+        color: #d1d5db;
+    }
+    
+    .text-gray-500 {
+        color: #9ca3af;
+    }
+    
+    .border-gray-300 {
+        border-color: #4b5563;
+    }
+    
+    .hover\:bg-gray-200:hover {
+        background-color: #374151;
+    }
+}
